@@ -1,15 +1,17 @@
 import { Heading, Text, useToast, VStack } from 'native-base';
 import { useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
 
 import { Header, Input, Button } from '../../components';
 import { reactotronError } from '../../utils/reactotron-error';
-import { useLoading } from '../../hooks/useLoading';
+import { useLoading } from '../../hooks';
 import { api } from '../../configs/global/axios';
 
 export function Find() {
   const [code, setCode] = useState('');
   const [isLoading, carring, outCarring] = useLoading();
   const toast = useToast();
+  const { navigate } = useNavigation();
 
   async function handleSubmit() {
     if (!code.trim()) {
@@ -25,7 +27,6 @@ export function Find() {
       await api.post('/polls/join', {
         code,
       });
-
       outCarring();
       toast.show({
         title: 'Sucesso agora você faz parte do bolão!',
@@ -33,6 +34,7 @@ export function Find() {
         placement: 'top',
       });
       setCode('');
+      navigate('poll');
     } catch (err) {
       outCarring();
       console.log(err);
@@ -82,6 +84,7 @@ export function Find() {
           placeholder='Qual o código do bolão?'
           value={code}
           onChangeText={setCode}
+          autoCapitalize='characters'
         />
 
         <Button mt={4} isLoading={isLoading} onPress={handleSubmit}>

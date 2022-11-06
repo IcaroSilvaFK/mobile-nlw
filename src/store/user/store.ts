@@ -13,20 +13,12 @@ interface IUseUserProps {
   removeUser(): void;
 }
 
-export const userUser = create<IUseUserProps>()(
-  persist(
-    (set) => ({
-      user: null,
-      setUser(user) {
-        set((state) => ({ ...state, user }));
-      },
-      removeUser() {
-        set((state) => ({ ...state, user: null }));
-      },
-    }),
-    {
-      name: '@user:zustnad',
-      getStorage: () => AsyncStorage,
-    }
-  )
-);
+export const userUser = create<IUseUserProps>()((set) => ({
+  user: null,
+  setUser(user) {
+    set((state) => ({ ...state, user }));
+  },
+  removeUser() {
+    set((state) => ({ ...state, user: null }));
+  },
+}));

@@ -12,7 +12,7 @@ import {
 } from '../../components';
 import { api } from '../../configs/global/axios';
 import { reactotronError } from '../../utils/reactotron-error';
-import { useLoading } from '../../hooks/useLoading';
+import { useLoading } from '../../hooks';
 
 interface IPollsProps {
   code: string;
@@ -23,15 +23,14 @@ interface IPollsProps {
     username: string;
   };
   ownerId: string;
-  participants: [
-    {
-      id: string;
-      user: {
-        avatarUrl: string;
-        username: string;
-      };
-    }
-  ];
+  participants: {
+    id: string;
+    user: {
+      avatarUrl: string;
+      username: string;
+    };
+  }[];
+
   _count: {
     participants: number;
   };
@@ -109,6 +108,7 @@ export function Pools() {
                 title: item.title,
               }}
               key={item.id}
+              onPress={() => navigation.navigate('details', { id: item.id })}
             />
           )}
           showsVerticalScrollIndicator={false}

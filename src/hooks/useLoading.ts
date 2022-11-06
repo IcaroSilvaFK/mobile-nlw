@@ -3,12 +3,12 @@ import { useState } from 'react';
 export function useLoading(): [boolean, () => void, () => void] {
   const [isLoading, setIsLoading] = useState(false);
 
-  function carrying() {
+  function carring() {
     setIsLoading(true);
   }
-  function outCarrying() {
+  function outCarring() {
     setIsLoading(false);
   }
 
-  return [isLoading, carrying, outCarrying];
+  return [isLoading, carring, outCarring];
 }

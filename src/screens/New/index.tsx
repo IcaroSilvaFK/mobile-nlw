@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Header, Input, Button } from '../../components';
 import Logo from '../../assets/logo.svg';
 import { api } from '../../configs/global/axios';
-import { useLoading } from '../../hooks/useLoading';
+import { useLoading } from '../../hooks';
 
 export function New() {
   const [poll, setPoll] = useState<string>('');

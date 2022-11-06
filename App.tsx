@@ -10,7 +10,7 @@ import { reactotron } from './src/configs/global/reactotron';
 import { Router } from './src/routes';
 
 import { theme } from './src/styles/theme';
-import { Loading } from './src/components/Loading';
+import { Loading } from './src/components';
 import { AuthContextProvider } from './src/contexts/AuthContext';
 
 if (__DEV__) {

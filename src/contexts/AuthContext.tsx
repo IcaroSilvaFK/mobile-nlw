@@ -5,14 +5,17 @@ import * as Google from 'expo-auth-session/providers/google';
 import { api } from '../configs/global/axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { reactotronError } from '../utils/reactotron-error';
-import { useLoading } from '../hooks/useLoading';
+import { useLoading } from '../hooks';
 import { userUser } from '../store/user/store';
+import { reactotronLog } from '../utils/reactoton-log';
 
 WebBrowser.maybeCompleteAuthSession();
 
 interface IUserProps {
-  name: string;
-  avatarUrl: string;
+  user: {
+    name: string;
+    avatarUrl: string;
+  };
 }
 
 interface IAuthContextProps {
@@ -28,8 +31,7 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
   const [isLoading, carring, outCarring] = useLoading();
   const { setUser } = userUser((state) => state);
   const [request, response, promptAsync] = Google.useAuthRequest({
-    clientId:
-      '94323794903-s9ljp637jeofl3vfidkshrjq10hnpkac.apps.googleusercontent.com',
+    clientId: process.env.CLIENT_ID,
     redirectUri: AuthSession.makeRedirectUri({ useProxy: true }),
     scopes: ['profile', 'email'],
   });
@@ -60,9 +62,11 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
 
       await AsyncStorage.setItem('@user:nlw', JSON.stringify(user));
 
+      reactotronLog('user', user);
+
       setUser({
-        avatarUrl: user.avatarUrl,
-        name: user.name,
+        avatarUrl: user.user.avatarUrl,
+        name: user.user.name,
       });
       outCarring();
     } catch (err) {
