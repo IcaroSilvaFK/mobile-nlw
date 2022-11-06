@@ -1,18 +1,64 @@
-import { Heading, Text, VStack } from 'native-base';
-
-import { Header } from '../../components/Header';
-import { Input } from '../../components/Input';
-import { Button } from '../../components/Button';
+import { Heading, Text, useToast, VStack } from 'native-base';
 import { useState } from 'react';
-import { reactotron } from '../../configs/global/reactotron';
+
+import { Header, Input, Button } from '../../components';
+import { reactotronError } from '../../utils/reactotron-error';
+import { useLoading } from '../../hooks/useLoading';
+import { api } from '../../configs/global/axios';
 
 export function Find() {
   const [code, setCode] = useState('');
+  const [isLoading, carring, outCarring] = useLoading();
+  const toast = useToast();
 
   async function handleSubmit() {
+    if (!code.trim()) {
+      toast.show({
+        title: 'Por favor coloque um código',
+        bg: 'red.500',
+        placement: 'top',
+      });
+    }
+
     try {
+      carring();
+      await api.post('/polls/join', {
+        code,
+      });
+
+      outCarring();
+      toast.show({
+        title: 'Sucesso agora você faz parte do bolão!',
+        bg: 'green.500',
+        placement: 'top',
+      });
+      setCode('');
     } catch (err) {
-      reactotron.error('find handleSubmit', err);
+      outCarring();
+      console.log(err);
+      reactotronError('find handleSubmit', err);
+
+      if (err.response?.data?.message === 'Poll do not exists') {
+        return toast.show({
+          title: 'Não foi possível encontrar o bolão',
+          bg: 'red.500',
+          placement: 'top',
+        });
+      }
+
+      if (err.response?.data?.message === 'You alredy joined this poll.') {
+        return toast.show({
+          title: 'Você já participa deste bolão!',
+          bg: 'red.500',
+          placement: 'top',
+        });
+      }
+
+      toast.show({
+        title: 'Não foi possivel entrar no bolão',
+        bg: 'red.500',
+        placement: 'top',
+      });
     }
   }
 
@@ -38,7 +84,7 @@ export function Find() {
           onChangeText={setCode}
         />
 
-        <Button mt={4}>
+        <Button mt={4} isLoading={isLoading} onPress={handleSubmit}>
           <Text textTransform='uppercase'>buscar bolão</Text>
         </Button>
       </VStack>

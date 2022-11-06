@@ -1,15 +1,14 @@
 import { Heading, Text, VStack, useToast } from 'native-base';
 import { useState } from 'react';
 
-import { Header } from '../../components/Header';
+import { Header, Input, Button } from '../../components';
 import Logo from '../../assets/logo.svg';
-import { Input } from '../../components/Input';
-import { Button } from '../../components/Button';
 import { api } from '../../configs/global/axios';
+import { useLoading } from '../../hooks/useLoading';
 
 export function New() {
   const [poll, setPoll] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, carring, outCarring] = useLoading();
   const toast = useToast();
 
   async function handleSubmit() {
@@ -22,7 +21,7 @@ export function New() {
     }
 
     try {
-      setIsLoading(true);
+      carring();
 
       const { data } = await api.post<{ code: string }>('/polls', {
         title: poll,
@@ -34,7 +33,7 @@ export function New() {
         bg: 'green.500',
       });
       setPoll('');
-      setIsLoading(false);
+      outCarring();
     } catch (err) {
       console.log(err);
       toast.show({
@@ -42,7 +41,7 @@ export function New() {
         placement: 'top',
         bg: 'red.500',
       });
-      setIsLoading(false);
+      outCarring();
     }
   }
 

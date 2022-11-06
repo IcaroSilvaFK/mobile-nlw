@@ -4,7 +4,9 @@ import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 import { api } from '../configs/global/axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { reactotron } from '../configs/global/reactotron';
+import { reactotronError } from '../utils/reactotron-error';
+import { useLoading } from '../hooks/useLoading';
+import { userUser } from '../store/user/store';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -14,7 +16,6 @@ interface IUserProps {
 }
 
 interface IAuthContextProps {
-  user: IUserProps | null;
   signIn: () => Promise<void>;
   isLoading: boolean;
 }
@@ -24,9 +25,8 @@ export const AuthContext = createContext<IAuthContextProps>(
 );
 
 export function AuthContextProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<IUserProps | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-
+  const [isLoading, carring, outCarring] = useLoading();
+  const { setUser } = userUser((state) => state);
   const [request, response, promptAsync] = Google.useAuthRequest({
     clientId:
       '94323794903-s9ljp637jeofl3vfidkshrjq10hnpkac.apps.googleusercontent.com',
@@ -36,12 +36,12 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
 
   async function signIn() {
     try {
-      setIsLoading(true);
+      carring();
       await promptAsync();
-      setIsLoading(false);
+      outCarring();
     } catch (err) {
-      reactotron.error('SignIn', err);
-      setIsLoading(false);
+      reactotronError('SignIn', err);
+      outCarring();
 
       throw err;
     }
@@ -49,7 +49,7 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
 
   async function signInWithGoogle(accessToken: string) {
     try {
-      setIsLoading(true);
+      carring();
       const { data } = await api.post<{ token: string }>('/users', {
         access_token: accessToken,
       });
@@ -64,10 +64,10 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
         avatarUrl: user.avatarUrl,
         name: user.name,
       });
-      setIsLoading(false);
+      outCarring();
     } catch (err) {
-      reactotron.error('signInWithGoogle', err);
-      setIsLoading(false);
+      reactotronError('signInWithGoogle', err);
+      outCarring();
       throw err;
     }
   }
@@ -78,27 +78,8 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
     }
   }, [response]);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const userLocal = JSON.parse(
-          await AsyncStorage.getItem('@user:nlw')
-        ) as IUserProps;
-
-        if (!user && userLocal) {
-          setUser({
-            avatarUrl: userLocal.avatarUrl,
-            name: userLocal.name,
-          });
-        }
-      } catch (err) {
-        reactotron.error('asyncStorage effect', err);
-      }
-    })();
-  }, [user]);
-
   return (
-    <AuthContext.Provider value={{ user, signIn, isLoading }}>
+    <AuthContext.Provider value={{ signIn, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

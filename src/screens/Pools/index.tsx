@@ -3,14 +3,16 @@ import { Icon, Text, VStack, FlatList, useToast } from 'native-base';
 import { Octicons } from '@expo/vector-icons';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
-import { Button } from '../../components/Button';
-import { Header } from '../../components/Header';
+import {
+  Button,
+  Header,
+  PoolCard,
+  Loading,
+  EmptyPoolList,
+} from '../../components';
 import { api } from '../../configs/global/axios';
-import { PoolCard } from '../../components/PoolCard';
-import { Loading } from '../../components/Loading';
-import { EmptyMyPoolList } from '../../components/EmptyMyPoolList';
-import { EmptyPoolList } from '../../components/EmptyPoolList';
-import { reactotron } from '../../configs/global/reactotron';
+import { reactotronError } from '../../utils/reactotron-error';
+import { useLoading } from '../../hooks/useLoading';
 
 interface IPollsProps {
   code: string;
@@ -38,7 +40,7 @@ interface IPollsProps {
 
 export function Pools() {
   const [polls, setPolls] = useState<IPollsProps[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, carring, outCarring] = useLoading();
   const navigation = useNavigation();
   const toast = useToast();
 
@@ -50,13 +52,13 @@ export function Pools() {
 
   async function fetchPolls() {
     try {
-      setIsLoading(true);
+      carring();
       const { data } = await api.get<{ polls: IPollsProps[] }>('/polls');
       setPolls(data.polls);
-      setIsLoading(false);
+      outCarring();
     } catch (err) {
-      reactotron.error('fetchPolls', err);
-      setIsLoading(false);
+      reactotronError('fetchPolls', err);
+      outCarring();
       toast.show({
         title: 'Não foi possivel carregar os bolões',
         placement: 'top',
