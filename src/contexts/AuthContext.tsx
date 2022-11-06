@@ -4,6 +4,7 @@ import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 import { api } from '../configs/global/axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { reactotron } from '../configs/global/reactotron';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -39,7 +40,7 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
       await promptAsync();
       setIsLoading(false);
     } catch (err) {
-      console.log(err);
+      reactotron.error('SignIn', err);
       setIsLoading(false);
 
       throw err;
@@ -65,7 +66,7 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
       });
       setIsLoading(false);
     } catch (err) {
-      console.log(err);
+      reactotron.error('signInWithGoogle', err);
       setIsLoading(false);
       throw err;
     }
@@ -84,12 +85,14 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
           await AsyncStorage.getItem('@user:nlw')
         ) as IUserProps;
 
-        setUser({
-          avatarUrl: userLocal.avatarUrl,
-          name: userLocal.name,
-        });
+        if (!user && userLocal) {
+          setUser({
+            avatarUrl: userLocal.avatarUrl,
+            name: userLocal.name,
+          });
+        }
       } catch (err) {
-        console.log(err);
+        reactotron.error('asyncStorage effect', err);
       }
     })();
   }, [user]);

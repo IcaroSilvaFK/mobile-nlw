@@ -5,12 +5,17 @@ import {
   Roboto_500Medium,
   Roboto_700Bold,
 } from '@expo-google-fonts/roboto';
+import { reactotron } from './src/configs/global/reactotron';
 
 import { Router } from './src/routes';
 
 import { theme } from './src/styles/theme';
 import { Loading } from './src/components/Loading';
 import { AuthContextProvider } from './src/contexts/AuthContext';
+
+if (__DEV__) {
+  reactotron.connect();
+}
 
 export default function App() {
   const [fontsLoaded] = useFonts({

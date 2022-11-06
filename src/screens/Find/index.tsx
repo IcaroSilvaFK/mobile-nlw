@@ -3,8 +3,19 @@ import { Heading, Text, VStack } from 'native-base';
 import { Header } from '../../components/Header';
 import { Input } from '../../components/Input';
 import { Button } from '../../components/Button';
+import { useState } from 'react';
+import { reactotron } from '../../configs/global/reactotron';
 
 export function Find() {
+  const [code, setCode] = useState('');
+
+  async function handleSubmit() {
+    try {
+    } catch (err) {
+      reactotron.error('find handleSubmit', err);
+    }
+  }
+
   return (
     <VStack flex={1} bg='gray.900'>
       <Header title='Buscar por código' showBackButton />
@@ -20,7 +31,12 @@ export function Find() {
           seu código único
         </Heading>
 
-        <Input mb={2} placeholder='Qual o código do bolão?' />
+        <Input
+          mb={2}
+          placeholder='Qual o código do bolão?'
+          value={code}
+          onChangeText={setCode}
+        />
 
         <Button mt={4}>
           <Text textTransform='uppercase'>buscar bolão</Text>
